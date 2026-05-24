@@ -1,87 +1,124 @@
 const { jsPDF } = window.jspdf;
 
-function generatePDF(){
+function generatePDF() {
 
 const doc = new jsPDF({
-orientation:"portrait",
-unit:"mm",
-format:[100,170]
+orientation: "portrait",
+unit: "mm",
+format: [100,170]
 });
 
-// VALUES
 
-const customer=document.getElementById("customerName").value||"Customer";
+// INPUT VALUES
 
-const address=document.getElementById("address").value||"-";
+const customer =
+document.getElementById("customerName").value || "Customer";
 
-const district=document.getElementById("district").value||"-";
+const address =
+document.getElementById("address").value || "-";
 
-const pin=document.getElementById("pincode").value||"-";
+const district =
+document.getElementById("district").value || "-";
 
-const phone=document.getElementById("phone").value||"-";
+const pin =
+document.getElementById("pincode").value || "-";
 
-const product=document.getElementById("product").value||"Product";
+const phone =
+document.getElementById("phone").value || "-";
 
-const amount=document.getElementById("orderValue").value||"0";
+const product =
+document.getElementById("product").value || "Product";
 
-const serial=document.getElementById("serial").value||"VS001";
+const amount =
+document.getElementById("orderValue").value || "0";
 
-const payment=
+const serial =
+document.getElementById("serial").value || "VS001";
+
+const payment =
 document.querySelector(
 'input[name="payment"]:checked'
 )?.value || "COD";
 
 
+
 // OUTER BORDER
 
-doc.setLineWidth(.7);
+doc.setLineWidth(0.6);
 doc.rect(3,3,94,162);
+
 
 
 // HEADER
 
 doc.setFont("helvetica","bold");
 doc.setFontSize(22);
+
 doc.text("VESPERA",8,15);
 
 doc.setFont("helvetica","normal");
 doc.setFontSize(8);
 
-doc.text("Chungathara, Nilambur",8,24);
-doc.text("Malappuram, Kerala - 679334",8,29);
-doc.text("+91 7025054109",8,35);
+doc.text("Anapparambil House",8,24);
+doc.text("Arakkal HMC Road",8,30);
+doc.text("Chalissery, Kerala - 679536",8,36);
+doc.text("+91 8281088967",8,42);
+
 
 
 // PAYMENT
 
-doc.setFillColor(0,0,0);
+doc.setFillColor(0);
 
-doc.roundedRect(52,8,40,8,1,1,"F");
+doc.roundedRect(
+52,
+8,
+38,
+8,
+1,
+1,
+"F"
+);
 
 doc.setTextColor(255);
 
-doc.setFontSize(9);
+doc.setFontSize(8);
 
 doc.text(
 payment==="COD"
-?"CASH ON DELIVERY"
-:"PREPAID ORDER",
+?
+"CASH ON DELIVERY"
+:
+"PREPAID",
 56,
 13
 );
+
 
 
 // AMOUNT BOX
 
 doc.setTextColor(0);
 
-doc.roundedRect(52,18,40,18,1,1);
+doc.roundedRect(
+52,
+18,
+38,
+18,
+1,
+1
+);
 
-doc.setFontSize(18);
+doc.setFont(
+"helvetica",
+"bold"
+);
+
+doc.setFontSize(16);
 
 doc.text(
 `INR ${amount}`,
-88,
+85,
 30,
 {align:"right"}
 );
@@ -91,101 +128,98 @@ doc.setFontSize(8);
 doc.text(
 `ORDER ID : ${serial}`,
 58,
-40
+42
 );
 
-doc.line(3,45,97,45);
+doc.line(
+3,
+47,
+97,
+47
+);
 
 
-// SELLER / SHIP
 
-doc.line(50,45,50,100);
+// SELLER / SHIP SECTION
+
+doc.line(
+50,
+47,
+50,
+105
+);
 
 doc.setFillColor(0);
 
-doc.roundedRect(8,50,28,7,1,1,"F");
+doc.roundedRect(
+8,
+52,
+30,
+7,
+1,
+1,
+"F"
+);
 
 doc.setTextColor(255);
-
-doc.setFontSize(8);
 
 doc.text(
 "FROM (SELLER)",
 11,
-55
+57
 );
 
-doc.roundedRect(53,50,20,7,1,1,"F");
+doc.roundedRect(
+55,
+52,
+20,
+7,
+1,
+1,
+"F"
+);
 
 doc.text(
 "SHIP TO",
-58,
-55
+59,
+57
 );
 
 doc.setTextColor(0);
 
 
-// SELLER CONTENT
+
+// SELLER DETAILS
+
+doc.setFont(
+"helvetica",
+"bold"
+);
 
 doc.setFontSize(14);
 
 doc.text(
-"SUFIYAN",
+"VESPERA",
 8,
-68
+70
 );
 
-doc.setFontSize(8);
+doc.setFont(
+"helvetica",
+"normal"
+);
+
+doc.setFontSize(7);
 
 doc.text(
-"Al Azhar College",
-"Madathilkandam"
+[
+"Al Azhar college",
+"Madathilkandam",
+"perumpillichira, Kerala - 685605"
+],
 8,
-77
+80
 );
-
-doc.text(
-"perumpillichira, Kerala - 685605",
-8,
-83
-);
-
-doc.text(
-"PIN: 685605",
-8,
-90
-);
-
-doc.text(
-"PH: +91 8281088967",
-8,
-96
-);
-
-
-// CUSTOMER CONTENT
-
-doc.setFont("helvetica","bold");
-
-doc.setFontSize(13);
-
-let name=
-doc.splitTextToSize(customer,30);
-
-doc.text(name,53,68);
-
-doc.setFont("helvetica","normal");
-
-doc.setFontSize(8);
-
-let addr=
-doc.splitTextToSize(
-`${address}, ${district}`,
-28
-);
-
-doc.text(addr,53,78);
 
 doc.setFont(
 "helvetica",
@@ -193,16 +227,71 @@ doc.setFont(
 );
 
 doc.text(
-`PIN: ${pin}`,
-53,
-92
+"PIN : 679536",
+8,
+95
 );
 
 doc.text(
-`PH: ${phone}`,
-53,
-98
+"PH : +91 8281088967",
+8,
+101
 );
+
+
+
+// CUSTOMER DETAILS
+
+doc.setFontSize(12);
+
+let cname =
+doc.splitTextToSize(
+customer,
+35
+);
+
+doc.text(
+cname,
+53,
+70
+);
+
+doc.setFont(
+"helvetica",
+"normal"
+);
+
+doc.setFontSize(8);
+
+let caddress =
+doc.splitTextToSize(
+`${address}, ${district}`,
+35
+);
+
+doc.text(
+caddress,
+53,
+82
+);
+
+doc.setFont(
+"helvetica",
+"bold"
+);
+
+doc.text(
+`PIN : ${pin}`,
+53,
+96
+);
+
+doc.text(
+`PH : ${phone}`,
+53,
+102
+);
+
 
 
 // PRODUCT HEADER
@@ -211,7 +300,7 @@ doc.setFillColor(0);
 
 doc.rect(
 3,
-105,
+110,
 94,
 9,
 "F"
@@ -222,20 +311,21 @@ doc.setTextColor(255);
 doc.text(
 "PRODUCT / ITEM",
 8,
-111
+116
 );
 
 doc.text(
 "QTY",
 70,
-111
+116
 );
 
 doc.text(
 "AMOUNT",
 80,
-111
+116
 );
+
 
 
 // PRODUCT ROW
@@ -244,70 +334,85 @@ doc.setTextColor(0);
 
 doc.setFontSize(10);
 
-let prod=
-doc.splitTextToSize(product,40);
+let prod =
+doc.splitTextToSize(
+product,
+40
+);
 
 doc.text(
 prod,
 8,
-123
+128
 );
 
 doc.text(
 "1",
-70,
-123
+72,
+128
 );
 
 doc.text(
 `INR ${amount}`,
 92,
-123,
+128,
 {align:"right"}
 );
 
 doc.line(
 8,
-127,
+132,
 92,
-127
+132
 );
 
 
+
 // TOTAL
+
+doc.setFont(
+"helvetica",
+"bold"
+);
 
 doc.setFontSize(13);
 
 doc.text(
 "ORDER TOTAL",
 8,
-138
+142
 );
 
-doc.setFontSize(20);
+doc.setFontSize(16);
 
 doc.text(
 `INR ${amount}`,
 92,
-138,
+142,
 {align:"right"}
 );
 
 doc.line(
 3,
-143,
+147,
 97,
-143
+147
 );
+
 
 
 // RETURN + THANK YOU
 
 doc.line(
 50,
-143,
+147,
 50,
 160
+);
+
+doc.setFont(
+"helvetica",
+"bold"
 );
 
 doc.setFontSize(8);
@@ -315,49 +420,68 @@ doc.setFontSize(8);
 doc.text(
 "RETURN ADDRESS",
 8,
-149
+151
 );
 
-doc.setFont("helvetica","normal");
+doc.setFont(
+"helvetica",
+"normal"
+);
 
-doc.setFontSize(7);
+doc.setFontSize(4.2);
 
 doc.text(
 [
-"Sufiyan",
-"Al Azhar Arts&sports college",
-"perumpillichira-685605",
-"Madathilkandam"
+"Muhammed Sufiyan",
+"Mobile : 8281088967",
+"AL Azhar college",
+"keral, 679536",
+"Area : Madathilkandam",
+"City : Perumpillichira"
 ],
 8,
-154
+154,
+{
+maxWidth:38,
+lineHeightFactor:0.85
+}
 );
 
-doc.setFont("helvetica","bold");
+
+// THANK YOU
+
+doc.setFont(
+"helvetica",
+"bold"
+);
 
 doc.setFontSize(10);
 
 doc.text(
 "THANK YOU",
-63,
-149
+62,
+151
 );
 
-doc.setFont("helvetica","normal");
+doc.setFont(
+"helvetica",
+"normal"
+);
 
-doc.setFontSize(7);
+doc.setFontSize(6);
 
 doc.text(
 "We deliver happiness!",
-63,
-155
+62,
+156
 );
 
 doc.text(
 "www.vespera.in",
-63,
+62,
 160
 );
+
 
 
 // FOOTER
