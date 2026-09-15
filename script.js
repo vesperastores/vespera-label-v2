@@ -1,503 +1,258 @@
 const { jsPDF } = window.jspdf;
 
-function generatePDF() {
+let labels = [];
 
-const doc = new jsPDF({
-orientation: "portrait",
-unit: "mm",
-format: [100,170]
+function numberToWords(num){
+num = parseInt(num) || 0;
+
+const ones=["","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"];
+const tens=["","","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"];
+
+if(num < 20) return ones[num];
+if(num < 100) return tens[Math.floor(num/10)] + (num%10 ? " " + ones[num%10] : "");
+if(num < 1000) return ones[Math.floor(num/100)] + " hundred" + (num%100 ? " " + numberToWords(num%100) : "");
+
+return num.toString();
+}
+
+function addLabel(){
+
+labels.push({
+customer: document.getElementById("customerName").value || "Customer",
+address: document.getElementById("address").value || "-",
+pin: document.getElementById("pincode").value || "-",
+phone: document.getElementById("phone").value || "-",
+product: document.getElementById("product").value || "Product",
+amount: document.getElementById("orderValue").value || "0",
+serial: document.getElementById("serial").value || "DS1",
+payment: document.querySelector('input[name="payment"]:checked')?.value || "COD"
 });
+  
+document.getElementById("labelCount").innerText =
+labels.length + " Labels Added";
+  
+alert(labels.length + " label added");
 
+document.getElementById("customerName").value = "";
+document.getElementById("address").value = "";
+document.getElementById("pincode").value = "";
+document.getElementById("phone").value = "";
+document.getElementById("product").value = "";
+document.getElementById("orderValue").value = "";
+document.getElementById("serial").value = "";
+document.getElementById("district").value = "";
 
-// INPUT VALUES
+}
 
-const customer =
-document.getElementById("customerName").value || "Customer";
+function drawLabel(doc, ox, oy, data){
 
-const address =
-document.getElementById("address").value || "-";
+const s = 0.87;
 
-const district =
-document.getElementById("district").value || "-";
+function X(v){ return ox + v * s; }
+function Y(v){ return oy + v * s; }
+function FS(v){ doc.setFontSize(v * s); }
 
-const pin =
-document.getElementById("pincode").value || "-";
+const amountWords = numberToWords(data.amount);
 
-const phone =
-document.getElementById("phone").value || "-";
+// BORDER
+doc.setLineWidth(.4);
+doc.rect(X(3),Y(3),94*s,162*s);
 
-const product =
-document.getElementById("product").value || "Product";
+// PAYMENT BOX
+doc.setFillColor(0);
+doc.roundedRect(X(52),Y(8),40*s,8*s,1,1,"F");
 
-const amount =
-document.getElementById("orderValue").value || "0";
+doc.setTextColor(255);
+FS(8);
+doc.text(
+data.payment === "COD" ? "CASH ON DELIVERY" : "PREPAID ORDER",
+X(72),
+Y(13),
+{align:"center"}
+);
 
-const serial =
-document.getElementById("serial").value || "VS001";
-
-const payment =
-document.querySelector(
-'input[name="payment"]:checked'
-)?.value || "COD";
-
-
-
-// OUTER BORDER
-
-doc.setLineWidth(0.6);
-doc.rect(3,3,94,162);
-
-
-
-// HEADER
+// PRICE BOX
+doc.setTextColor(0);
+doc.roundedRect(X(52),Y(18),40*s,18*s,1,1);
 
 doc.setFont("helvetica","bold");
-doc.setFontSize(22);
+FS(14);
+doc.text(`INR ${data.amount}`,X(72),Y(28),{align:"center"});
 
-doc.text("VESPERA",8,15);
+FS(5);
+doc.text(amountWords,X(72),Y(34),{align:"center"});
+
+// ORDER ID
+FS(8);
+doc.text(`ORDER ID : ${data.serial}`,X(58),Y(40));
+
+doc.line(X(3),Y(45),X(97),Y(45));
+
+// SELLER / BUYER
+doc.line(X(50),Y(45),X(50),Y(100));
+
+doc.setFillColor(0);
+doc.roundedRect(X(8),Y(50),28*s,7*s,1,1,"F");
+doc.roundedRect(X(53),Y(50),25*s,7*s,1,1,"F");
+
+doc.setTextColor(255);
+FS(8);
+doc.text("FROM (SELLER)",X(11),Y(55));
+doc.text("TO (BUYER)",X(58),Y(55));
+
+doc.setTextColor(0);
+
+// SELLER
+doc.setFont("helvetica","bold");
+FS(14);
+doc.text("SUFIYAN",X(8),Y(68));
 
 doc.setFont("helvetica","normal");
-doc.setFontSize(8);
+FS(7);
+doc.text([
+"Anapparambil House",
+"Arakkal HMC Road",
+"Chalissery, Kerala - 679536"
+],X(8),Y(77));
 
-doc.text("Anapparambil House",8,24);
-doc.text("Arakkal HMC Road",8,30);
-doc.text("Chalissery, Kerala - 679536",8,36);
-doc.text("+91 8281088967",8,42);
+doc.setFont("helvetica","bold");
+doc.text("PIN : 679536",X(8),Y(91));
+doc.text("PH : +91 8281088967",X(8),Y(97));
+doc.text("Customer id : 1265200969",X(8),Y(103));
 
+// BUYER
+doc.setFont("helvetica","bold");
+FS(13);
+doc.text(data.customer,X(53),Y(68));
 
+doc.setFont("helvetica","bold");
+FS(9);
 
-// PAYMENT
+let buyerLines = doc.splitTextToSize(data.address,28*s);
+buyerLines = buyerLines.slice(0,4);
 
-doc.setFillColor(0);
+doc.text(buyerLines,X(53),Y(80));
 
-doc.roundedRect(
-52,
-8,
-38,
-8,
-1,
-1,
-"F"
-);
-
-doc.setTextColor(255);
-
-doc.setFontSize(8);
-
-doc.text(
-payment==="COD"
-?
-"CASH ON DELIVERY"
-:
-"PREPAID",
-56,
-13
-);
-
-
-
-// AMOUNT BOX
-
-doc.setTextColor(0);
-
-doc.roundedRect(
-52,
-18,
-38,
-18,
-1,
-1
-);
-
-doc.setFont(
-"helvetica",
-"bold"
-);
-
-doc.setFontSize(16);
-
-doc.text(
-`INR ${amount}`,
-85,
-30,
-{align:"right"}
-);
-
-doc.setFontSize(8);
-
-doc.text(
-`ORDER ID : ${serial}`,
-58,
-42
-);
-
-doc.line(
-3,
-47,
-97,
-47
-);
-
-
-
-// SELLER / SHIP SECTION
-
-doc.line(
-50,
-47,
-50,
-105
-);
-
-doc.setFillColor(0);
-
-doc.roundedRect(
-8,
-52,
-30,
-7,
-1,
-1,
-"F"
-);
-
-doc.setTextColor(255);
-
-doc.text(
-"FROM (SELLER)",
-11,
-57
-);
-
-doc.roundedRect(
-55,
-52,
-20,
-7,
-1,
-1,
-"F"
-);
-
-doc.text(
-"SHIP TO",
-59,
-57
-);
-
-doc.setTextColor(0);
-
-
-
-// SELLER DETAILS
-
-doc.setFont(
-"helvetica",
-"bold"
-);
-
-doc.setFontSize(14);
-
-doc.text(
-"VESPERA",
-8,
-70
-);
-
-doc.setFont(
-"helvetica",
-"normal"
-);
-
-doc.setFontSize(7);
-
-doc.text(
-[
-"Al Azhar college",
-"Madathilkandam",
-"perumpillichira, Kerala - 685605"
-],
-8,
-80
-);
-
-doc.setFont(
-"helvetica",
-"bold"
-);
-
-doc.text(
-"PIN : 679536",
-8,
-95
-);
-
-doc.text(
-"PH : +91 8281088967",
-8,
-101
-);
-
-
-
-// CUSTOMER DETAILS
-
-doc.setFontSize(12);
-
-let cname =
-doc.splitTextToSize(
-customer,
-35
-);
-
-doc.text(
-cname,
-53,
-70
-);
-
-doc.setFont(
-"helvetica",
-"normal"
-);
-
-doc.setFontSize(8);
-
-let caddress =
-doc.splitTextToSize(
-`${address}, ${district}`,
-35
-);
-
-doc.text(
-caddress,
-53,
-82
-);
-
-doc.setFont(
-"helvetica",
-"bold"
-);
-
-doc.text(
-`PIN : ${pin}`,
-53,
-96
-);
-
-doc.text(
-`PH : ${phone}`,
-53,
-102
-);
-
-
+doc.setFont("helvetica","bold");
+FS(7);
+doc.text(`PIN : ${data.pin}`,X(53),Y(95));
+doc.text(`PH : ${data.phone}`,X(53),Y(101));
 
 // PRODUCT HEADER
-
 doc.setFillColor(0);
-
-doc.rect(
-3,
-110,
-94,
-9,
-"F"
-);
+doc.rect(X(3),Y(105),94*s,9*s,"F");
 
 doc.setTextColor(255);
+FS(8);
+doc.text("PRODUCT / ITEM",X(8),Y(111));
+doc.text("QTY",X(70),Y(111));
+doc.text("AMOUNT",X(80),Y(111));
 
-doc.text(
-"PRODUCT / ITEM",
-8,
-116
-);
-
-doc.text(
-"QTY",
-70,
-116
-);
-
-doc.text(
-"AMOUNT",
-80,
-116
-);
-
-
-
-// PRODUCT ROW
-
+// PRODUCT
 doc.setTextColor(0);
+FS(10);
+doc.text(data.product,X(8),Y(123));
+doc.text("1",X(72),Y(123));
+doc.text(`INR ${data.amount}`,X(92),Y(123),{align:"right"});
 
-doc.setFontSize(10);
-
-let prod =
-doc.splitTextToSize(
-product,
-40
-);
-
-doc.text(
-prod,
-8,
-128
-);
-
-doc.text(
-"1",
-72,
-128
-);
-
-doc.text(
-`INR ${amount}`,
-92,
-128,
-{align:"right"}
-);
-
-doc.line(
-8,
-132,
-92,
-132
-);
-
-
+doc.line(X(8),Y(127),X(92),Y(127));
 
 // TOTAL
+FS(13);
+doc.text("ORDER TOTAL",X(8),Y(138));
 
-doc.setFont(
-"helvetica",
-"bold"
-);
+FS(16);
+doc.text(`INR ${data.amount}`,X(92),Y(138),{align:"right"});
 
-doc.setFontSize(13);
-
-doc.text(
-"ORDER TOTAL",
-8,
-142
-);
-
-doc.setFontSize(16);
-
-doc.text(
-`INR ${amount}`,
-92,
-142,
-{align:"right"}
-);
-
-doc.line(
-3,
-147,
-97,
-147
-);
-
-
+doc.line(X(3),Y(143),X(97),Y(143));
 
 // RETURN + THANK YOU
+doc.line(X(50),Y(143),X(50),Y(160));
 
-doc.line(
-50,
-147,
-50,
-160
-);
+FS(8);
+doc.text("RETURN ADDRESS",X(8),Y(149));
 
-doc.setFont(
-"helvetica",
-"bold"
-);
-
-doc.setFontSize(8);
-
-doc.text(
-"RETURN ADDRESS",
-8,
-151
-);
-
-doc.setFont(
-"helvetica",
-"normal"
-);
-
-doc.setFontSize(4.2);
-
-doc.text(
-[
-"Muhammed Sufiyan",
+FS(5);
+doc.text([
+"Name : Muhammed Sufiyan",
 "Mobile : 8281088967",
-"AL Azhar college",
-"keral, 679536",
-"Area : Madathilkandam",
-"City : Perumpillichira"
-],
-8,
-154,
-{
-maxWidth:38,
-lineHeightFactor:0.85
-}
-);
+"Address : Anapparambil House",
+"State : Kerala",
+"Pincode : 679536",
+"Area : Arakkal HMC Road",
+"City : Chalissery"
+],X(8),Y(152));
 
+FS(10);
+doc.text("THANK YOU",X(63),Y(149));
 
-// THANK YOU
-
-doc.setFont(
-"helvetica",
-"bold"
-);
-
-doc.setFontSize(10);
-
-doc.text(
-"THANK YOU",
-62,
-151
-);
-
-doc.setFont(
-"helvetica",
-"normal"
-);
-
-doc.setFontSize(6);
-
-doc.text(
-"We deliver happiness!",
-62,
-156
-);
-
-doc.text(
-"www.vespera.in",
-62,
-160
-);
-
-
+FS(7);
+doc.text("We deliver happiness!",X(63),Y(155));
+doc.text("www.vespera.in",X(63),Y(160));
 
 // FOOTER
-
 doc.setFillColor(0);
+doc.rect(X(3),Y(161),94*s,4*s,"F");
 
-doc.rect(
-3,
-161,
-94,
-4,
-"F"
-);
+}
 
-doc.save(
-`shipping-label-${serial}.pdf`
-);
+function generateA4PDF(){
+
+if(labels.length === 0){
+alert("Add at least one label first");
+return;
+}
+
+const doc = new jsPDF({
+orientation:"portrait",
+unit:"mm",
+format:"a4"
+});
+
+const positions = [
+[9,0],
+[114,0],
+[9,148.5],
+[114,148.5]
+];
+
+labels.forEach((label,index)=>{
+
+if(index > 0 && index % 4 === 0){
+doc.addPage();
+}
+
+const pos = positions[index % 4];
+
+drawLabel(doc,pos[0],pos[1],label);
+
+});
+
+doc.save("vespera-a4-labels.pdf");
+
+}
+
+function generatePDF(){
+
+const data = {
+customer: document.getElementById("customerName").value || "Customer",
+address: document.getElementById("address").value || "-",
+pin: document.getElementById("pincode").value || "-",
+phone: document.getElementById("phone").value || "-",
+product: document.getElementById("product").value || "Product",
+amount: document.getElementById("orderValue").value || "0",
+serial: document.getElementById("serial").value || "DS1",
+payment: document.querySelector('input[name="payment"]:checked')?.value || "COD"
+};
+
+const doc = new jsPDF({
+orientation:"portrait",
+unit:"mm",
+format:[100,170]
+});
+
+drawLabel(doc,0,0,data);
+
+doc.save(`shipping-label-${data.serial}.pdf`);
 
 }
