@@ -104,23 +104,8 @@ doc.setTextColor(0);
 
 // SELLER
 doc.setFont("helvetica", "bold");
-
-let sellerName = "MUHAMMED SUFIYAN";
-let sellerFontSize = 14;
-const maxSellerWidth = 48;
-
-// Fit seller name inside the column
-while (sellerFontSize > 8) {
-    FS(sellerFontSize);
-
-    if (doc.getTextWidth(sellerName) <= maxSellerWidth) {
-        break;
-    }
-
-    sellerFontSize -= 0.5;
-}
-
-doc.text(sellerName, X(8), Y(68));
+FS(10);
+doc.text("MUHAMMED SUFIYAN", X(8), Y(68));
 doc.setFont("helvetica","normal");
 FS(7);
 doc.text([
