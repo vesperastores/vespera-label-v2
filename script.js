@@ -105,20 +105,20 @@ doc.setTextColor(0);
 // SELLER
 doc.setFont("helvetica","bold");
 FS(14);
-doc.text("SUFIYAN",X(8),Y(68));
+doc.text("MUHAMMED SUFIYAN",X(8),Y(68));
 
 doc.setFont("helvetica","normal");
 FS(7);
 doc.text([
-"Anapparambil House",
-"Arakkal HMC Road",
-"Chalissery, Kerala - 679536"
+"Madathilkandam",
+"perumpillichira",
+"Thoduppuzha, Kerala - 685605"
 ],X(8),Y(77));
 
 doc.setFont("helvetica","bold");
-doc.text("PIN : 679536",X(8),Y(91));
+doc.text("PIN : 685605",X(8),Y(91));
 doc.text("PH : +91 8281088967",X(8),Y(97));
-doc.text("Customer id : 1265200969",X(8),Y(103));
+doc.text("Customer id : 1344893279",X(8),Y(103));
 
 // BUYER
 doc.setFont("helvetica","bold");
@@ -176,11 +176,11 @@ FS(5);
 doc.text([
 "Name : Muhammed Sufiyan",
 "Mobile : 8281088967",
-"Address : Anapparambil House",
+"Address : Madathilkandam",
 "State : Kerala",
-"Pincode : 679536",
-"Area : Arakkal HMC Road",
-"City : Chalissery"
+"Pincode : 685605",
+"Area : Perumpillichira",
+"City : Thodupuzha"
 ],X(8),Y(152));
 
 FS(10);
